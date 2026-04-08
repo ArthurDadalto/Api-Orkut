@@ -11,11 +11,11 @@ const postSchema = Joi.object({
     "string.min": "O conteudo deve ter pelo menos 5 caracteres",
     "any.required": "O conteúdo é obrigatório",
   }),
-  usuario_id: Joi.number().interger().required().messages({
-    "number.base": "O usuário_id deve ser um número",
-    "number.interger": "O usuario_id deve ser número inteiro",
-    "any.required": "O usuario_id é obrigatório",
-  }),
+  // usuario_id: Joi.number().interger().required().messages({
+  //   "number.base": "O usuário_id deve ser um número",
+  //   "number.interger": "O usuario_id deve ser número inteiro",
+  //   "any.required": "O usuario_id é obrigatório",
+  // }),
 });
 
 function validarPost(req, res, next) {

@@ -141,19 +141,27 @@ app.get("/posts", async (req, res) => {
 });
 
 // Criando a Rota POST
-app.post("/posts", async (req, res) => {
+app.post("/posts", auth, validarPost, async (req, res) => {
   try {
-    const { titulo, conteudo, usuario_id } = req.body;
+    const { titulo, conteudo } = req.body;
+
     const resultado = await pool.query(
       `
+
       INSERT INTO post (titulo, conteudo, usuario_id)
+
       VALUES ($1, $2, $3)
+
       RETURNING *
+
       `,
+
       [titulo, conteudo, req.usuario.id],
     );
+
     res.status(201).json({
       mensagem: "Post criado com sucesso",
+
       post: resultado.rows[0],
     });
   } catch (erro) {
@@ -195,17 +203,29 @@ app.put("/posts/:id", auth, validarPost, async (req, res) => {
 });
 
 // ROTA DELETE
-app.delete("/posts/:id", async (req, res) => {
+app.delete("/posts/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
 
+    const post = await pool.query(`SELECT * FROM post WHERE id=$1`, [id]);
+
+    if (post.rows.length === 0) {
+      return res.status(404).json({ mensagem: "Post não encontrado" });
+    }
+
+    if (post.rows[0].usuario_id !== req.usuario.id) {
+      return res.status(403).json({ mensagem: "Sem permissão" });
+    }
+
     const resultado = await pool.query(
       `DELETE FROM post WHERE id=$1 RETURNING *`,
+
       [id],
     );
 
     res.json({
       mensagem: "Post deletado com sucesso",
+
       post: resultado.rows[0],
     });
   } catch (erro) {
